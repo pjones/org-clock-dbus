@@ -1,0 +1,16 @@
+[package]
+name = "org-clock-dbus"
+version = "0.1.0"
+description = "Interact with org-clock through dbus"
+authors = ["Peter J. Jones <pjones@devalot.com>"]
+edition = "2021"
+readme = "README.md"
+keywords = ["cli", "dbus", "emacs", "org-mode"]
+categories = ["command-line-utilities"]
+
+[dependencies]
+clap = { version = "4.3", features = ["derive"] }
+serde_json = { version = "1.0.125"}
+dbus = { version = "0.9.7" }
+strfmt = "0.2.4"
+chrono = "0.4.38"
