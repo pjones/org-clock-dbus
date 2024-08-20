@@ -25,6 +25,13 @@
       packages = forAllSystems (system:
         let pkgs = nixpkgsFor.${system}; in {
           monitor = pkgs.callPackage ./monitor { };
+
+          lisp = pkgs.emacs.pkgs.elpaBuild {
+            pname = "org-clock-dbus";
+            version = "0.1.0";
+            src = ./lisp/org-clock-dbus.el;
+            packageRequires = [ pkgs.emacs ];
+          };
         });
 
       devShells = forAllSystems (system:
