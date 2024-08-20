@@ -39,6 +39,10 @@ pub struct MonitorArgs {
     /// How to format org-clock strings.
     #[arg(short, long, default_value = "[{time}] {heading}")]
     pub format: String,
+
+    /// Count down from WHEN instead of counting up (e.g.: 25m).
+    #[arg(short, long, value_name = "WHEN")]
+    pub down_from: Option<String>,
 }
 
 #[derive(Clone, Debug, Subcommand)]

@@ -13,6 +13,7 @@
 use chrono::{DateTime, Local};
 use serde_json::json;
 use std::collections::HashMap;
+use std::time::Duration;
 use strfmt::strfmt;
 
 use crate::cli::{MonitorArgs, OutputMode};
@@ -32,14 +33,26 @@ pub struct Clock {
     pub state: State,
     mode: OutputMode,
     format: String,
+    down_from: Option<Duration>,
 }
 
 impl Clock {
     pub fn new(args: MonitorArgs) -> Clock {
+        let down_from = args
+            .down_from
+            .map(|s| match s.parse::<humantime::Duration>() {
+                Ok(duration) => duration.into(),
+                Err(_) => {
+                    eprintln!("Error: invalid --down-from value: {}", s);
+                    std::process::exit(1)
+                }
+            });
+
         Clock {
             state: State::Stopped,
             mode: args.mode,
             format: args.format,
+            down_from,
         }
     }
 
@@ -55,7 +68,12 @@ impl Clock {
                 let mut vars: HashMap<String, String> = HashMap::new();
                 vars.insert("heading".to_string(), heading.clone());
 
-                let delta = Local::now() - started_at;
+                let delta = if let Some(duration) = self.down_from {
+                    (*started_at + duration) - Local::now()
+                } else {
+                    Local::now() - started_at
+                };
+
                 let mins = delta.num_minutes() % 60;
                 let hours = delta.num_minutes() / 60;
 

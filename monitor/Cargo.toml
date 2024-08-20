@@ -14,3 +14,4 @@ serde_json = { version = "1.0.125"}
 dbus = { version = "0.9.7" }
 strfmt = "0.2.4"
 chrono = "0.4.38"
+humantime = "2.1.0"
