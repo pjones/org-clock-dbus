@@ -22,17 +22,16 @@
         import nixpkgs { inherit system; });
     in
     {
+      packages = forAllSystems (system:
+        let pkgs = nixpkgsFor.${system}; in {
+          monitor = pkgs.callPackage ./monitor { };
+        });
+
       devShells = forAllSystems (system:
         let pkgs = nixpkgsFor.${system}; in {
           default = pkgs.mkShell {
-            buildInputs = with pkgs; [
-              cargo
-              clippy
-              dbus
-              pkg-config
-              rustc
-              rustfmt
-            ];
+            inputsFrom = [ self.packages.${system}.monitor ];
+            buildInputs = [ pkgs.rustfmt ];
           };
         });
     };
