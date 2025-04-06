@@ -81,7 +81,16 @@
    org-clock-dbus-path
    org-clock-dbus-service
    "state" :readwrite
-   (org-clock-dbus--value) t))
+   (org-clock-dbus--value) t)
+  (dbus-register-method
+   :session
+   org-clock-dbus-service
+   org-clock-dbus-path
+   org-clock-dbus-service
+   "Stop"
+   (lambda (&rest _args)
+     (org-clock-out nil t)
+     :ignore)))
 
 (defun org-clock-dbus--unload ()
   "Remove Org Clock D-Bus mode from `org-mode' hooks."
