@@ -7,7 +7,7 @@
 ;; Keywords: org
 ;; URL: https://github.com/pjones/org-clock-db
 ;; Package-Requires: ((emacs "28.1") (org "9.6.0"))
-;; Version: 0.2.0
+;; Version: 1.0.0
 
 ;; This file is not part of GNU Emacs.
 

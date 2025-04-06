@@ -14,16 +14,20 @@ use clap::Parser;
 
 mod cli;
 mod clock;
+mod dbus;
 mod monitor;
 
 use cli::Cli;
 
-fn main() {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
 
     match &cli.command {
-        cli::Command::Monitor(args) => {
-            monitor::monitor(args.clone()).unwrap();
+        cli::Command::Monitor(args) => monitor::monitor(args.clone()),
+
+        cli::Command::Stop => {
+            let helper = dbus::DBusHelper::new()?;
+            helper.clock_stop()
         }
     }
 }

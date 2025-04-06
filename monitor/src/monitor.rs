@@ -10,86 +10,33 @@
    contained in the LICENSE file.
 */
 
-use chrono::DateTime;
-use dbus::blocking::{BlockingSender, Connection};
-use dbus::message::{MatchRule, Message};
+use dbus::message::Message;
 use std::error::Error;
 use std::sync::mpsc::{channel, Receiver, RecvTimeoutError, Sender};
 use std::thread;
-use std::time::{Duration, UNIX_EPOCH};
+use std::time::Duration;
 
 use crate::cli::MonitorArgs;
 use crate::clock::{Clock, State};
+use crate::dbus::DBusHelper;
 
 pub fn monitor(args: MonitorArgs) -> Result<(), Box<dyn Error>> {
     let (tx, rx) = channel();
-    let connection = Connection::new_session()?;
+    let helper = DBusHelper::new()?;
 
     thread::spawn(move || output(args, &rx));
 
-    if let Ok(starting) = get_starting_state(&connection) {
+    if let Ok(starting) = helper.get_starting_state() {
         tx.send(starting)?;
     }
 
-    let mut rule = MatchRule::new();
-    rule.msg_type = Some(dbus::message::MessageType::Signal);
-    rule.interface = Some("org.freedesktop.DBus.Properties".into());
-    rule.member = Some("PropertiesChanged".into());
-    rule.path = Some("/org/gnu/Emacs/Org/Clock".into());
-
-    connection.add_match(rule, move |_: (), _, msg| {
+    helper.on_prop_changed(move |msg| {
         dispatch(&msg, &tx);
         true
-    })?;
+    });
 
-    loop {
-        connection.process(Duration::from_secs(60))?;
-    }
-}
-
-fn get_starting_state(conn: &Connection) -> Result<State, Box<dyn Error>> {
-    let method = Message::new_method_call(
-        "org.gnu.Emacs.Org.Clock",
-        "/org/gnu/Emacs/Org/Clock",
-        "org.freedesktop.DBus.Properties",
-        "Get",
-    )?
-    .append2("org.gnu.Emacs.Org.Clock", "state");
-
-    let result = conn.send_with_reply_and_block(method, Duration::from_millis(5000))?;
-    let props: dbus::arg::Variant<dbus::arg::PropMap> = result.read1()?;
-    decode_state(&props.0)
-}
-
-fn decode_state(props: &dbus::arg::PropMap) -> Result<State, Box<dyn Error>> {
-    use dbus::arg::prop_cast;
-    let started_prop: Option<&u64> = prop_cast(&props, "started");
-
-    if let Some(started) = started_prop {
-        let started_at = DateTime::from(UNIX_EPOCH + Duration::from_secs(*started));
-        let heading: Option<&String> = prop_cast(&props, "heading");
-
-        Ok(State::Running {
-            started_at,
-            heading: heading
-                .map(|x| x.to_string())
-                .unwrap_or(String::from("missing")),
-        })
-    } else {
-        Ok(State::Stopped)
-    }
-}
-
-fn decode_prop_change_message(msg: &Message) -> Option<State> {
-    use dbus::arg::{cast, PropMap};
-    let (arg0, arg1): (Option<String>, Option<PropMap>) = msg.get2();
-    arg0.filter(|s| s == "org.gnu.Emacs.Org.Clock")?;
-
-    let properties = arg1?;
-    let state_props = properties.get("state")?;
-    let casted: &PropMap = cast(&state_props.0)?;
-
-    decode_state(&casted).ok()
+    helper.event_loop();
+    Ok(())
 }
 
 fn dispatch(msg: &Message, tx: &Sender<State>) {
@@ -100,7 +47,7 @@ fn dispatch(msg: &Message, tx: &Sender<State>) {
 
     match member.as_str() {
         "PropertiesChanged" => {
-            if let Some(state) = decode_prop_change_message(msg) {
+            if let Some(state) = DBusHelper::decode_prop_change_message(msg) {
                 tx.send(state).unwrap();
             }
         }

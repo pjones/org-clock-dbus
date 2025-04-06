@@ -49,6 +49,9 @@ pub struct MonitorArgs {
 pub enum Command {
     #[command(about = "Monitor DBus for a status bar")]
     Monitor(MonitorArgs),
+
+    #[command(about = "Stop the running clock")]
+    Stop,
 }
 
 #[derive(Clone, Debug, Parser)]

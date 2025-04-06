@@ -5,10 +5,10 @@
 
 rustPlatform.buildRustPackage {
   pname = "org-clock-db";
-  version = "0.1.0";
+  version = "1.0.0";
   src = ./.;
 
-  cargoHash = "sha256-OX1lerkBPcaopyltxuR5hJ3x8S+YffGSodTWh7Fz28U=";
+  cargoHash = "sha256-dWyN4HRYHwNAzaa5ulfHdi61OHfQRC6qk31Kzih4zZ0=";
 
   nativeBuildInputs = [
     pkg-config
