@@ -10,7 +10,7 @@
    contained in the LICENSE file.
 */
 
-use chrono::{DateTime, Local};
+use chrono::{DateTime, Local, TimeDelta};
 use serde_json::json;
 use std::collections::HashMap;
 use std::time::Duration;
@@ -34,6 +34,12 @@ pub struct Clock {
     mode: OutputMode,
     format: String,
     down_from: Option<Duration>,
+}
+
+#[derive(Debug)]
+pub struct Message {
+    pub title: String,
+    pub negative: bool,
 }
 
 impl Clock {
@@ -74,14 +80,26 @@ impl Clock {
                     Local::now() - started_at
                 };
 
-                let mins = delta.num_minutes() % 60;
-                let hours = delta.num_minutes() / 60;
+                let negative = delta < TimeDelta::zero();
+                let abs_min = delta.abs().num_minutes();
 
-                let time_str = format!("{:0>2}:{:0>2}", hours, mins);
+                let mins = abs_min % 60;
+                let hours = abs_min / 60;
+
+                let time_str = format!(
+                    "{}{:0>2}:{:0>2}",
+                    if negative { "-" } else { "" },
+                    hours,
+                    mins
+                );
+
                 vars.insert("time".to_string(), time_str);
 
                 match strfmt(self.format.as_str(), &vars) {
-                    Ok(title) => self.output_running_msg(&title),
+                    Ok(title) => {
+                        let msg = Message { title, negative };
+                        self.output_running_msg(&msg)
+                    }
                     Err(e) => println!("{:?}", e),
                 }
             }
@@ -92,30 +110,37 @@ impl Clock {
         match &self.mode {
             OutputMode::Simple => println!(""),
             OutputMode::Waybar => {
-                let msg = json!({
+                let output = json!({
                     "text": "",
                     "alt": "stopped",
                     "tooltip": "",
-                    "class": "stopped",
+                    "class": ["stopped"],
                     "percentage": "",
                 });
-                println!("{}", msg.to_string());
+                println!("{}", output.to_string());
             }
         }
     }
 
-    fn output_running_msg(&self, title: &String) {
+    fn output_running_msg(&self, msg: &Message) {
         match &self.mode {
-            OutputMode::Simple => println!("{}", title),
+            OutputMode::Simple => println!("{}", msg.title),
             OutputMode::Waybar => {
-                let msg = json!({
-                    "text": title,
+                let mut classes = Vec::new();
+                classes.push("running");
+
+                if msg.negative {
+                    classes.push("negative");
+                }
+
+                let output = json!({
+                    "text": msg.title,
                     "alt": "running",
-                    "tooltip": title,
-                    "class": "running",
+                    "tooltip": msg.title,
+                    "class": classes,
                     "percentage": "",
                 });
-                println!("{}", msg.to_string());
+                println!("{}", output.to_string());
             }
         }
     }
