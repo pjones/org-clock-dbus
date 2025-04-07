@@ -42,6 +42,12 @@
   (concat dbus-path-emacs "/Org/Clock")
   "The path name to register and use.")
 
+(defvar org-clock-dbus--method-stop nil
+  "The handle to the stop method registration.")
+
+(defvar org-clock-dbus--property-state nil
+  "The handle to the state property registration.")
+
 (defun org-clock-dbus--value ()
   "Return a D-Bus value for the Clock property."
   (if (org-clocking-p)
@@ -68,35 +74,44 @@
 
 (defun org-clock-dbus--load ()
   "Set up the hooks necessary for Org Clock D-Bus to run."
-  (dolist (hook org-clock-dbus--hooks)
-    (add-hook hook #'org-clock-dbus--update))
-  (dbus-register-service
-   :session org-clock-dbus-service
-   :allow-replacement
-   :replace-existing
-   :do-not-queue)
-  (dbus-register-property
-   :session
-   org-clock-dbus-service
-   org-clock-dbus-path
-   org-clock-dbus-service
-   "state" :readwrite
-   (org-clock-dbus--value) t)
-  (dbus-register-method
-   :session
-   org-clock-dbus-service
-   org-clock-dbus-path
-   org-clock-dbus-service
-   "Stop"
-   (lambda (&rest _args)
-     (org-clock-out nil t)
-     :ignore)))
+  (when (null org-clock-dbus--method-stop)
+    (dolist (hook org-clock-dbus--hooks)
+      (add-hook hook #'org-clock-dbus--update))
+    (dbus-register-service
+     :session org-clock-dbus-service
+     :allow-replacement
+     :replace-existing
+     :do-not-queue)
+    (setq org-clock-dbus--property-state
+          (dbus-register-property
+           :session
+           org-clock-dbus-service
+           org-clock-dbus-path
+           org-clock-dbus-service
+           "state" :readwrite nil t))
+    (org-clock-dbus--update)
+    (setq org-clock-dbus--method-stop
+          (dbus-register-method
+           :session
+           org-clock-dbus-service
+           org-clock-dbus-path
+           org-clock-dbus-service
+           "Stop"
+           (lambda (&rest _args)
+             (org-clock-out nil t)
+             :ignore)))))
 
 (defun org-clock-dbus--unload ()
   "Remove Org Clock D-Bus mode from `org-mode' hooks."
   (dolist (hook org-clock-dbus--hooks)
     (remove-hook hook #'org-clock-dbus--update))
-  (dbus-unregister-service :session org-clock-dbus-service))
+  (dbus-unregister-service :session org-clock-dbus-service)
+  (when org-clock-dbus--method-stop
+    (dbus-unregister-object org-clock-dbus--method-stop)
+    (setq org-clock-dbus--method-stop nil))
+  (when org-clock-dbus--property-state
+    (dbus-unregister-object org-clock-dbus--property-state)
+    (setq org-clock-dbus--property-state nil)))
 
 ;;;###autoload
 (define-minor-mode org-clock-dbus-mode
@@ -112,3 +127,4 @@
 (provide 'org-clock-dbus)
 
 ;;; org-clock-dbus.el ends here
+
