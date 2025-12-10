@@ -36,7 +36,7 @@ the Org clock and display clock information in your desktop's panel.
      "custom/org-clock-dbus": {
        "exec": "org-clock-dbus monitor --mode waybar --down-from 25m",
        "on-click": "org-clock-dbus stop",
-       "format": "{icon} {}",
+       "format": "{icon} {text}",
        "format-icons": {
          "running": "",
          "negative": ""

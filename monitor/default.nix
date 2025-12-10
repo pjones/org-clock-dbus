@@ -1,6 +1,7 @@
-{ rustPlatform
-, pkg-config
-, dbus
+{
+  rustPlatform,
+  pkg-config,
+  dbus,
 }:
 
 rustPlatform.buildRustPackage {
@@ -8,7 +9,7 @@ rustPlatform.buildRustPackage {
   version = "1.0.0";
   src = ./.;
 
-  cargoHash = "sha256-dWyN4HRYHwNAzaa5ulfHdi61OHfQRC6qk31Kzih4zZ0=";
+  cargoHash = "sha256-8GwzFeyS6fdw3lChApFDuijN9vpZIf91IhWxcOdrVRM=";
 
   nativeBuildInputs = [
     pkg-config

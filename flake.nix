@@ -5,7 +5,8 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
   };
 
-  outputs = { self, nixpkgs, ... }:
+  outputs =
+    { self, nixpkgs, ... }:
     let
       supportedSystems = [
         "x86_64-linux"
@@ -14,16 +15,18 @@
       ];
 
       # Function to generate a set based on supported systems:
-      forAllSystems = f:
-        nixpkgs.lib.genAttrs supportedSystems (system: f system);
+      forAllSystems = f: nixpkgs.lib.genAttrs supportedSystems (system: f system);
 
       # Attribute set of nixpkgs for each system:
-      nixpkgsFor = forAllSystems (system:
-        import nixpkgs { inherit system; });
+      nixpkgsFor = forAllSystems (system: import nixpkgs { inherit system; });
     in
     {
-      packages = forAllSystems (system:
-        let pkgs = nixpkgsFor.${system}; in {
+      packages = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgsFor.${system};
+        in
+        {
           monitor = pkgs.callPackage ./monitor { };
 
           lisp = pkgs.emacs.pkgs.elpaBuild {
@@ -32,14 +35,25 @@
             src = ./lisp/org-clock-dbus.el;
             packageRequires = [ pkgs.emacs ];
           };
-        });
+        }
+      );
 
-      devShells = forAllSystems (system:
-        let pkgs = nixpkgsFor.${system}; in {
+      checks = forAllSystems (system: self.packages.${system});
+
+      devShells = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgsFor.${system};
+        in
+        {
           default = pkgs.mkShell {
             inputsFrom = [ self.packages.${system}.monitor ];
-            buildInputs = [ pkgs.rustfmt ];
+            buildInputs = [
+              pkgs.rustfmt
+              pkgs.rust-analyzer
+            ];
           };
-        });
+        }
+      );
     };
 }
