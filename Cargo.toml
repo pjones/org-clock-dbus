@@ -4,9 +4,14 @@ version = "1.0.0"
 description = "Interact with org-clock through dbus"
 authors = ["Peter J. Jones <pjones@devalot.com>"]
 edition = "2021"
-readme = "README.md"
+readme = "README.org"
+license = "GPL-3.0-or-later"
 keywords = ["cli", "dbus", "emacs", "org-mode"]
 categories = ["command-line-utilities"]
+
+[[bin]]
+name = "org-clock-dbus"
+path = "src/main.rs"
 
 [dependencies]
 clap = { version = "4.3", features = ["derive"] }

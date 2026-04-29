@@ -27,7 +27,9 @@
           pkgs = nixpkgsFor.${system};
         in
         {
-          monitor = pkgs.callPackage ./monitor { };
+          default = self.packages.${system}.monitor;
+
+          monitor = pkgs.callPackage ./. { };
 
           lisp = pkgs.emacs.pkgs.elpaBuild {
             pname = "org-clock-dbus";
