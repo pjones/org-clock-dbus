@@ -14,5 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+    - name: Install Dependencies
+      run: sudo apt -qq install -y libdbus-1-dev pkg-config
     - name: Run tests
       run: cargo test --verbose
