@@ -19,6 +19,10 @@ the Org clock and display clock information in your desktop's panel.
 
 * Using the =org-clock-dbus= Tool
 
+  The =org-clock-dbus= tool allows you to view and control the OrgMode
+  clock from the command line.  It can be built from source or you can
+  download a pre-built binary from the GitHub release.
+
 ** Stopping the Running Clock
 
    #+header: :exports code
@@ -27,6 +31,8 @@ the Org clock and display clock information in your desktop's panel.
    #+end_src
 
 ** Waybar Configuration
+
+   [[file:images/waybar.png]]
 
    The following configuration will display the Org heading for the
    current clock, and a countdown from 25 minutes:
