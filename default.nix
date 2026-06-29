@@ -10,7 +10,7 @@ rustPlatform.buildRustPackage {
   version = "1.0.0";
   src = nix-gitignore.gitignoreSource [ ] ./.;
 
-  cargoHash = "sha256-8GwzFeyS6fdw3lChApFDuijN9vpZIf91IhWxcOdrVRM=";
+  cargoHash = "sha256-25qM/1vIsKxEll+WLCSi6pUozmuxMQrM/iubXSh2XY8=";
 
   nativeBuildInputs = [
     pkg-config
