@@ -5,6 +5,11 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
 
+    fenix = {
+      url = "github:nix-community/fenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     naersk = {
       url = "github:nix-community/naersk";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -23,18 +28,48 @@
         perSystem =
           { pkgs, system, ... }:
           let
-            naersk = pkgs.callPackage inputs.naersk { };
+            muslTarget =
+              if system == "x86_64-linux" then
+                "x86_64-unknown-linux-musl"
+              else if system == "aarch64-linux" then
+                "aarch64-unknown-linux-musl"
+              else
+                throw "Unsupported system: ${system}";
+
+            toolchain =
+              with inputs.fenix.packages.${system};
+              combine [
+                minimal.rustc
+                minimal.cargo
+                targets.${muslTarget}.latest.rust-std
+              ];
+
+            naersk = inputs.naersk.lib.${system}.override {
+              cargo = toolchain;
+              rustc = toolchain;
+            };
           in
           {
             packages.default = self.packages.${system}.monitor;
 
             packages.monitor = naersk.buildPackage {
               src = pkgs.nix-gitignore.gitignoreSource [ ] ./.;
+              doCheck = true;
 
               nativeBuildInputs = with pkgs; [
+                pkgsStatic.stdenv.cc
                 pkg-config
-                dbus
               ];
+
+              buildInputs = with pkgs; [
+                (pkgsStatic.dbus.override (_: {
+                  enableSystemd = false;
+                  x11Support = false;
+                }))
+              ];
+
+              CARGO_BUILD_TARGET = muslTarget;
+              CARGO_BUILD_RUSTFLAGS = "-C target-feature=+crt-static";
             };
 
             packages.lisp = pkgs.emacs.pkgs.elpaBuild {
@@ -43,6 +78,9 @@
               src = ./lisp/org-clock-dbus.el;
               packageRequires = [ pkgs.emacs ];
             };
+
+            checks.lisp = self.packages.${system}.lisp;
+            checks.monitor = self.packages.${system}.monitor;
 
             devShells.default = pkgs.mkShell {
               inputsFrom = [ self.packages.${system}.monitor ];
