@@ -1,0 +1,50 @@
+name: "Release"
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v[0-9]+'
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ "ubuntu-24.04", "ubuntu-24.04-arm" ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: nixbuild/nix-quick-install-action@v34
+
+      - name: Build Static Binary
+        run: nix build --print-build-logs
+
+      - name: Upload Static Binary
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ github.ref_name }}-${{ runner.os }}-${{ runner.arch }}
+          path: |
+            result/bin/org-clock-dbus
+            lisp/org-clock-dbus.el
+
+  publish:
+    if: github.ref_type == 'tag'
+    permissions: write-all
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: nixbuild/nix-quick-install-action@v34
+      - run: nix build .#changelog --print-build-logs
+
+      - uses: actions/download-artifact@v8
+        with: { path: artifacts }
+
+      - name: Publish Release
+        uses: softprops/action-gh-release@v3
+        with:
+          name: Release ${{ github.ref_name }}
+          body_path: result/changelog.md
+          make_latest: true
+          files: artifacts/*

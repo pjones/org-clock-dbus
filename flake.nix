@@ -79,6 +79,28 @@
               packageRequires = [ pkgs.emacs ];
             };
 
+            packages.changelog = pkgs.stdenvNoCC.mkDerivation (final: {
+              pname = "changelog";
+              version = self.packages.${system}.monitor.version;
+              src = ./CHANGELOG.yml;
+              dontUnpack = true;
+              dontBuild = true;
+
+              buildInputs = with pkgs; [
+                yaml2json
+                jq
+              ];
+
+              installPhase = ''
+                mkdir -p "$out"
+                yaml2json < "$src" |
+                  jq --raw-output --arg version "${final.version}" '
+                    .versions.[$version].markdown
+                  ' > "$out/changelog.md"
+              '';
+            });
+
+            checks.changelog = self.packages.${system}.changelog;
             checks.lisp = self.packages.${system}.lisp;
             checks.monitor = self.packages.${system}.monitor;
 
