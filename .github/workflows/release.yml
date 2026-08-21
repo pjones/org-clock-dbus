@@ -39,7 +39,9 @@ jobs:
       - run: nix build .#changelog --print-build-logs
 
       - uses: actions/download-artifact@v8
-        with: { path: artifacts }
+        with:
+          path: artifacts
+          skip-decompress: true
 
       - name: Publish Release
         uses: softprops/action-gh-release@v3
