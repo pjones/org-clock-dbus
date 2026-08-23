@@ -30,6 +30,45 @@ the Org clock and display clock information in your desktop's panel.
      org-clock-dbus stop
    #+end_src
 
+** Wayle Configuration
+
+   [[file:images/wayle.png]]
+
+   The following configuration will display the Org heading for the
+   current clock, and a countdown from 25 minutes:
+
+   #+header: :exports code
+   #+begin_src toml
+     [[bar.layout]]
+     # Normal bar stuff...
+     center = [{class = "org-clock-dbus", module = "custom-org-clock-dbus"}]
+
+     [[modules.custom]]
+     id = "org-clock-dbus"
+     command = "org-clock-dbus monitor --mode wayle --down-from 25m"
+     mode = "watch"
+     format = "{{ text }}"
+     class-format = "{{ sign }}"
+     hide-if-empty = true
+     icon-name = "tb-time-duration-30-symbolic"
+     left-click = "org-clock-dbus stop"
+   #+end_src
+
+   If you want to clock module to stand out when the timer goes
+   negative use the following CSS:
+
+   #+header: :exports code
+   #+begin_src css
+     .org-clock-dbus.negative menubutton.bar-button {
+       --bar-btn-label-color: var(--bg-surface);
+       --bar-btn-bg: var(--status-error);
+
+       image {
+         --bar-btn-icon-color: var(--bg-surface);
+       }
+     }
+   #+end_src
+
 ** Waybar Configuration
 
    [[file:images/waybar.png]]
