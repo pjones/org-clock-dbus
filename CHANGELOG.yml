@@ -1,4 +1,14 @@
 versions:
+  1.1.0:
+    date: Unreleased
+    makrdown: |
+      ## Added
+
+      - New output mode: `wayle`.  Allows [Wayle][] to remove the bar button
+        when the clock is not running.  Also includes a `sign` attribute in
+        the JSON which can be used from CSS to change the button color when
+        the timer goes negative.
+
   1.0.0:
     date: 2026-08-21
     markdown: |
