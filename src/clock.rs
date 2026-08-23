@@ -119,6 +119,7 @@ impl Clock {
                 });
                 println!("{}", output.to_string());
             }
+            OutputMode::Wayle => println!(""),
         }
     }
 
@@ -139,6 +140,14 @@ impl Clock {
                     "tooltip": msg.title,
                     "class": classes,
                     "percentage": "",
+                });
+                println!("{}", output.to_string());
+            }
+            OutputMode::Wayle => {
+                let output = json!({
+                    "text": msg.title,
+                    "alt": "running",
+                    "sign": if msg.negative { "negative" } else { "positive" },
                 });
                 println!("{}", output.to_string());
             }

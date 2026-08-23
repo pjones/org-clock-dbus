@@ -19,6 +19,9 @@ pub enum OutputMode {
 
     /// Use the Waybar JSON format.
     Waybar,
+
+    /// Use the Wayle JSON format.
+    Wayle,
 }
 
 impl std::fmt::Display for OutputMode {
@@ -26,6 +29,7 @@ impl std::fmt::Display for OutputMode {
         match *self {
             OutputMode::Simple => write!(f, "simple"),
             OutputMode::Waybar => write!(f, "waybar"),
+            OutputMode::Wayle => write!(f, "wayle"),
         }
     }
 }
