@@ -105,6 +105,9 @@
             checks.monitor = self.packages.${system}.monitor;
 
             devShells.default = pkgs.mkShell {
+              env.CARGO_BUILD_TARGET = self.packages.${system}.monitor.CARGO_BUILD_TARGET;
+              env.CARGO_BUILD_RUSTFLAGS = self.packages.${system}.monitor.CARGO_BUILD_RUSTFLAGS;
+
               inputsFrom = [ self.packages.${system}.monitor ];
               buildInputs = [
                 pkgs.rustfmt
