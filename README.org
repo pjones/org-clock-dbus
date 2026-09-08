@@ -1,8 +1,11 @@
 #+title: Org Clock D-Bus
 
-This is an Emacs package that creates a D-Bus API for the OrgMode
+This is an Emacs package that creates a D-Bus API for the =org-mode=
 clock.  It includes a command line tool that can be used to control
 the Org clock and display clock information in your desktop's panel.
+
+*NOTE:* This project is hand-written, artisanal free software.  It is a
+gift from me to the Emacs community that has given me so much.
 
 * Using the Emacs Package
 
@@ -10,18 +13,32 @@ the Org clock and display clock information in your desktop's panel.
 
   2. Load the file
 
-  3. Start the minor mode:
+     #+header: :exports code
+     #+begin_src lisp
+       (require 'org-clock-dbus)
+     #+end_src
+
+  3. Ensure the minor mode is started with =org-mode=:
 
      #+header: :exports code
-     #+begin_src emacs-lisp
+     #+begin_src lisp
+       (add-hook 'org-mode-hook #'org-clock-dbus-mode)
+     #+end_src
+
+     And if you want to start the minor mode now:
+
+     #+header: :exports code
+     #+begin_src lisp
        (org-clock-dbus-mode)
      #+end_src
 
+  4. Clock in and out of tasks like normal
+
 * Using the =org-clock-dbus= Tool
 
-  The =org-clock-dbus= tool allows you to view and control the OrgMode
+  The =org-clock-dbus= tool allows you to view and control the =org-mode=
   clock from the command line.  It can be built from source or you can
-  download a pre-built binary from the GitHub release.
+  download a pre-built static binary from the GitHub release.
 
 ** Stopping the Running Clock
 
