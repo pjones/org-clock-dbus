@@ -1,8 +1,9 @@
 #+title: Org Clock D-Bus
 
 This is an Emacs package that creates a D-Bus API for the =org-mode=
-clock.  It includes a command line tool that can be used to control
-the Org clock and display clock information in your desktop's panel.
+clock.  It includes an (optional) command line tool that can be used to
+control the Org clock and display clock information in your desktop's
+panel.
 
 *NOTE:* This project is hand-written, artisanal free software.  It is a
 gift from me to the Emacs community that has given me so much.
