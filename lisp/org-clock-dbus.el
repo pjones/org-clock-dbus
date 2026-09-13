@@ -1,10 +1,10 @@
-;;; org-clock-dbus.el --- Monitor org-clock from outside Emacs -*- lexical-binding: t; -*-
+;;; org-clock-dbus.el --- Monitor org-clock from D-Bus -*- lexical-binding: t; -*-
 
-;; Copyright (c) 2024-2025 Peter J. Jones <pjones@devalot.com>
+;; Copyright (c) 2024-2026 Peter J. Jones <pjones@devalot.com>
 
 ;; Author: Peter J. Jones <pjones@devalot.com>
 ;; Maintainer: Peter J. Jones <pjones@devalot.com>
-;; Keywords: org
+;; Keywords: comm outlines unix
 ;; URL: https://github.com/pjones/org-clock-db
 ;; Package-Requires: ((emacs "28.1") (org "9.6.0"))
 ;; Version: 1.1.0
@@ -24,6 +24,11 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
+;;
+;; This is an Emacs package that creates a D-Bus API for the org-mode
+;; clock.  It includes an (optional) command line tool that can be
+;; used to control the Org clock and display clock information in your
+;; desktop's panel.
 
 ;;; Code:
 (require 'dbus)
