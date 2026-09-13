@@ -4,6 +4,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
+    releases.url = "github:pjones/releases";
 
     fenix = {
       url = "github:nix-community/fenix";
@@ -79,35 +80,37 @@
               packageRequires = [ pkgs.emacs ];
             };
 
-            packages.changelog = pkgs.stdenvNoCC.mkDerivation (final: {
+            packages.changes = pkgs.stdenvNoCC.mkDerivation (final: {
               pname = "changelog";
               version = self.packages.${system}.monitor.version;
               src = ./CHANGELOG.yml;
               dontUnpack = true;
               dontBuild = true;
 
-              buildInputs = with pkgs; [
-                yaml2json
-                jq
+              buildInputs = [
+                self.inputs.releases.packages.${system}.changelog
               ];
 
               installPhase = ''
                 mkdir -p "$out"
-                yaml2json < "$src" |
-                  jq --raw-output --arg version "${final.version}" '
-                    .versions.[$version].markdown
-                  ' > "$out/changelog.md"
-
-                if [[ "$(head -n 1 "$out/changelog.md")" == "null" ]]; then
-                  echo >&2 "ERROR: malformed CHANGELOG"
-                  exit 1
-                fi
+                changelog -m "${final.version}" "$src" > "$out/changes.md"
               '';
             });
 
-            checks.changelog = self.packages.${system}.changelog;
+            checks.changes = self.packages.${system}.changes;
             checks.lisp = self.packages.${system}.lisp;
             checks.monitor = self.packages.${system}.monitor;
+
+            apps.changelog = {
+              type = "app";
+              meta.description = "Generate the CHANGELOG.md file";
+              program = toString (
+                pkgs.writeShellScript "gen-changelog" ''
+                  ${self.inputs.releases.packages.${system}.changelog}/bin/changelog \
+                  CHANGELOG.yml > CHANGELOG.md
+                ''
+              );
+            };
 
             devShells.default = pkgs.mkShell {
               env.CARGO_BUILD_TARGET = self.packages.${system}.monitor.CARGO_BUILD_TARGET;

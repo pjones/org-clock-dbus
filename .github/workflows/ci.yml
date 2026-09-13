@@ -60,15 +60,15 @@ jobs:
             exit 1
           fi
 
-      - run: nix build .#changelog --print-build-logs
-      - run: cp result/changelog.md artifacts
+      - run: nix build .#changes --print-build-logs
+      - run: cp result/changes.md artifacts
 
       - name: Publish Release
         if: github.ref_type == 'tag'
         uses: softprops/action-gh-release@v3
         with:
           name: Release ${{ github.ref_name }}
-          body_path: ${{ github.workspace }}/artifacts/changelog.md
+          body_path: ${{ github.workspace }}/artifacts/changes.md
           make_latest: true
           working_directory: artifacts
           fail_on_unmatched_files: true
