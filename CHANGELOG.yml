@@ -1,8 +1,8 @@
-versions:
-  1.1.0:
+releases:
+  - version: 1.1.0
     date: 2026-09-08
     markdown: |
-      ## New Features
+      ### New Features
 
       - New output mode: `wayle`.  Allows [Wayle][] to remove the bar button
         when the clock is not running.  Also includes a `sign` attribute in
@@ -11,7 +11,7 @@ versions:
 
       [wayle]: https://github.com/wayle-rs/wayle
 
-  1.0.0:
+  - version: 1.0.0
     date: 2026-08-21
     markdown: |
       Initial release.
