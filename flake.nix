@@ -97,6 +97,11 @@
                   jq --raw-output --arg version "${final.version}" '
                     .versions.[$version].markdown
                   ' > "$out/changelog.md"
+
+                if [[ "$(head -n 1 "$out/changelog.md")" == "null" ]]; then
+                  echo >&2 "ERROR: malformed CHANGELOG"
+                  exit 1
+                fi
               '';
             });
 
