@@ -10,7 +10,10 @@ gift from me to the Emacs community that has given me so much.
 
 * Using the Emacs Package
 
-  1. Put the =org-clock-dbus.el= file in your load path
+  1. Install the =org-clock-dbus.el= file:
+
+     You can install this package from [[https://melpa.org/#/org-clock-dbus][MELPA]] or you can download the
+     file from here and put it into your =load-path=.
 
   2. Load the file
 
@@ -38,8 +41,10 @@ gift from me to the Emacs community that has given me so much.
 * Using the =org-clock-dbus= Tool
 
   The =org-clock-dbus= tool allows you to view and control the =org-mode=
-  clock from the command line.  It can be built from source or you can
-  download a pre-built static binary from the GitHub release.
+  clock from the command line.
+
+  It can be built from source or you can download a pre-built static
+  binary from the [[https://github.com/pjones/org-clock-dbus/releases][GitHub release]].
 
 ** Stopping the Running Clock
 
