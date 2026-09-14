@@ -5,7 +5,7 @@
 ;; Author: Peter J. Jones <pjones@devalot.com>
 ;; Maintainer: Peter J. Jones <pjones@devalot.com>
 ;; Keywords: comm outlines unix
-;; URL: https://github.com/pjones/org-clock-db
+;; URL: https://github.com/pjones/org-clock-dbus
 ;; Package-Requires: ((emacs "28.1") (org "9.6.0"))
 ;; Version: 1.1.0
 
